@@ -7,13 +7,7 @@
  */
 
 // Map product names to image filenames
-const productImageMap = {
-  'Laptop': '/images/laptop.jpeg',
-  'Smartphone': '/images/smartphone.jpeg',
-  'Headphones': '/images/headphones.jpeg',
-  'Keyboard': '/images/keyboerd.png', // Note: keeping the actual filename as is
-  'Mouse': '/images/mouse.jpg'
-};
+const productImageMap = {};
 
 /**
  * Get image path for a product
@@ -36,17 +30,17 @@ export const getProductImage = (productName, imageUrl = null) => {
       }
     }
   }
-  
+
   // Use the mapped local image based on product name (case-insensitive)
   const normalizedName = productName ? productName.trim() : '';
-  const mappedImage = productImageMap[normalizedName] || 
-                      productImageMap[normalizedName.toLowerCase()] ||
-                      productImageMap[normalizedName.charAt(0).toUpperCase() + normalizedName.slice(1).toLowerCase()];
-  
+  const mappedImage = productImageMap[normalizedName] ||
+    productImageMap[normalizedName.toLowerCase()] ||
+    productImageMap[normalizedName.charAt(0).toUpperCase() + normalizedName.slice(1).toLowerCase()];
+
   if (mappedImage) {
     return mappedImage;
   }
-  
+
   // Fallback to placeholder if no match found
   console.warn(`No image mapped for product: ${productName}`);
   return 'https://via.placeholder.com/300';

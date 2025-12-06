@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { api } from '../services/api'
+import { useLanguage } from '../context/LanguageContext'
 import './Checkout.css'
 
 function Checkout() {
@@ -10,6 +11,7 @@ function Checkout() {
   const [error, setError] = useState(null)
   const [success, setSuccess] = useState(false)
   const navigate = useNavigate()
+  const { t } = useLanguage()
 
   const [formData, setFormData] = useState({
     customerName: '',
@@ -48,7 +50,7 @@ function Checkout() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    
+
     if (!formData.customerName || !formData.customerEmail || !formData.customerAddress) {
       setError('Please fill in all fields')
       return
@@ -91,8 +93,8 @@ function Checkout() {
 
   return (
     <div className="checkout-container">
-      <h1 className="checkout-header">Checkout</h1>
-      
+      <h1 className="checkout-header">{t('cart.checkout')}</h1>
+
       {error && <div className="error-message">{error}</div>}
 
       <div className="order-summary">
@@ -104,7 +106,7 @@ function Checkout() {
           </div>
         ))}
         <div className="order-total">
-          <span>Total:</span>
+          <span>{t('cart.total')}:</span>
           <span>${calculateTotal().toFixed(2)}</span>
         </div>
       </div>
@@ -157,8 +159,8 @@ function Checkout() {
           />
         </div>
 
-        <button 
-          type="submit" 
+        <button
+          type="submit"
           className="submit-order-btn"
           disabled={submitting}
         >

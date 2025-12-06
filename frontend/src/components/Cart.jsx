@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { api } from '../services/api'
 import { getProductImage } from '../utils/imageMapper'
+import { useLanguage } from '../context/LanguageContext'
 import './Cart.css'
 
 function Cart() {
@@ -9,6 +10,7 @@ function Cart() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const navigate = useNavigate()
+  const { t } = useLanguage()
 
   useEffect(() => {
     fetchCart()
@@ -68,19 +70,21 @@ function Cart() {
   if (cartItems.length === 0) {
     return (
       <div className="empty-cart">
-        <h2>Your cart is empty</h2>
-        <p>Add some products to get started!</p>
+        <h2>{t('cart.empty')}</h2>
+        <button className="continue-btn" onClick={() => navigate('/')}>
+          {t('cart.continue')}
+        </button>
       </div>
     )
   }
 
   return (
     <div className="cart-container">
-      <h1 className="cart-header">Shopping Cart</h1>
+      <h1 className="cart-header">{t('cart.title')}</h1>
       {cartItems.map(item => (
         <div key={item.id} className="cart-item">
-          <img 
-            src={getProductImage(item.name, item.image_url)} 
+          <img
+            src={getProductImage(item.name, item.image_url)}
             alt={item.name}
             className="cart-item-image"
             onError={(e) => {
@@ -91,7 +95,7 @@ function Cart() {
             <h3 className="cart-item-name">{item.name}</h3>
             <p className="cart-item-price">${parseFloat(item.price).toFixed(2)} each</p>
             <div className="quantity-controls">
-              <button 
+              <button
                 className="quantity-btn"
                 onClick={() => handleUpdateQuantity(item.id, item.quantity - 1)}
               >
@@ -104,17 +108,17 @@ function Cart() {
                 onChange={(e) => handleUpdateQuantity(item.id, parseInt(e.target.value) || 1)}
                 min="1"
               />
-              <button 
+              <button
                 className="quantity-btn"
                 onClick={() => handleUpdateQuantity(item.id, item.quantity + 1)}
               >
                 +
               </button>
-              <button 
+              <button
                 className="remove-btn"
                 onClick={() => handleRemoveItem(item.id)}
               >
-                Remove
+                ✕
               </button>
             </div>
           </div>
@@ -125,13 +129,13 @@ function Cart() {
       ))}
       <div className="cart-summary">
         <div className="cart-total">
-          Total: ${calculateTotal().toFixed(2)}
+          {t('cart.total')}: ${calculateTotal().toFixed(2)}
         </div>
-        <button 
+        <button
           className="checkout-btn"
           onClick={() => navigate('/checkout')}
         >
-          Proceed to Checkout
+          {t('cart.checkout')}
         </button>
       </div>
     </div>

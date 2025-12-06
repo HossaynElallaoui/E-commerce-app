@@ -2,11 +2,13 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import { api } from '../services/api'
 import { useAuth } from '../context/AuthContext'
+import { useLanguage } from '../context/LanguageContext'
 import './Navbar.css'
 
 function Navbar() {
   const [cartCount, setCartCount] = useState(0)
   const { user, logout, isAdmin } = useAuth()
+  const { language, setLanguage, t } = useLanguage()
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -34,40 +36,55 @@ function Navbar() {
 
   return (
     <nav className="navbar">
-      <div className="navbar-content">
+      <div className="navbar-container">
+        {/* Left: Logo */}
         <Link to="/" className="navbar-brand">
-            <img src="/images/logo.png" alt="Cisia" className="navbar-logo" />
-            <span className="navbar-brand-text">CISIA ECOMMERCE</span>
-          </Link>
-        <div className="navbar-links">
-          <Link to="/" className="navbar-link">
-            Products
-          </Link>
-          <Link to="/cart" className="navbar-link">
-            Cart
+          <img src="/images/logo.png" alt="Artisan Treasures" className="navbar-logo" />
+          <span className="navbar-brand-text">Artisan Treasures</span>
+        </Link>
+
+        {/* Center: Navigation Links (Pill) */}
+        <div className="navbar-center">
+          <Link to="/" className="nav-pill-link">{t('nav.products')}</Link>
+          <Link to="/about" className="nav-pill-link">{t('nav.story')}</Link>
+          <Link to="/contact" className="nav-pill-link">{t('nav.contact')}</Link>
+        </div>
+
+        {/* Right: Actions (Cart, Auth, Lang) */}
+        <div className="navbar-actions">
+          {/* Language Switcher */}
+          <select
+            value={language}
+            onChange={(e) => setLanguage(e.target.value)}
+            className="lang-select"
+          >
+            <option value="en">🇺🇸 EN</option>
+            <option value="fr">🇫🇷 FR</option>
+            <option value="ar">🇲🇦 AR</option>
+          </select>
+
+          <Link to="/cart" className="action-icon-btn" aria-label="Cart">
+            <span className="cart-icon">🛒</span>
             {cartCount > 0 && <span className="cart-badge">{cartCount}</span>}
           </Link>
+
           {user ? (
-            <>
+            <div className="user-menu">
               {isAdmin() && (
-                <Link to="/admin" className="navbar-link">
-                  Admin Dashboard
+                <Link to="/admin" className="admin-link">
+                  {t('nav.dashboard')}
                 </Link>
               )}
-              <span className="navbar-user">Hello, {user.username}</span>
-              <button className="logout-nav-btn" onClick={handleLogout}>
-                Logout
+              <span className="user-greeting">{t('nav.greeting')}, {user.username}</span>
+              <button className="logout-btn-small" onClick={handleLogout}>
+                {t('nav.logout')}
               </button>
-            </>
+            </div>
           ) : (
-            <>
-              <Link to="/login" className="navbar-link">
-                Login
-              </Link>
-              <Link to="/register" className="navbar-link">
-                Register
-              </Link>
-            </>
+            <div className="auth-buttons">
+              <Link to="/login" className="login-link">{t('nav.login')}</Link>
+              <Link to="/register" className="register-btn">{t('nav.register')}</Link>
+            </div>
           )}
         </div>
       </div>
