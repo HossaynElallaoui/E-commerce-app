@@ -1,153 +1,130 @@
 import { useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Send, MapPin, Phone, Mail, CheckCircle, Sparkles } from 'lucide-react'
+import { useLanguage } from '../context/LanguageContext'
 import './Contact.css'
 
 function Contact() {
-    const [formData, setFormData] = useState({
-        name: '',
-        email: '',
-        subject: '',
-        message: ''
-    })
-    const [status, setStatus] = useState(null) // null, 'submitting', 'success', 'error'
-
-    const handleChange = (e) => {
-        const { name, value } = e.target
-        setFormData(prev => ({
-            ...prev,
-            [name]: value
-        }))
-    }
+    const [formData, setFormData] = useState({ name: '', email: '', message: '' })
+    const [submitted, setSubmitted] = useState(false)
+    const [loading, setLoading] = useState(false)
+    const { t } = useLanguage()
 
     const handleSubmit = (e) => {
         e.preventDefault()
-        setStatus('submitting')
-
+        setLoading(true)
         // Simulate API call
         setTimeout(() => {
-            setStatus('success')
-            setFormData({ name: '', email: '', subject: '', message: '' })
+            setSubmitted(true)
+            setLoading(false)
         }, 1500)
     }
 
     return (
         <div className="contact-page">
-            <div className="contact-header">
-                <h1 className="contact-title">Get in Touch</h1>
-                <p className="contact-subtitle">We'd love to hear from you. Send us a message!</p>
-            </div>
-
-            <div className="contact-container">
-                <div className="contact-info-card">
-                    <h2>Contact Information</h2>
-                    <p className="info-text">
-                        Have a question about our products or your order? Reach out to us and we'll get back to you as soon as possible.
+            <div className="max-width-container contact-shell">
+                <motion.div
+                    initial={{ opacity: 0, x: -30 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    className="contact-info-block"
+                >
+                    <span className="editorial-category gold-text">{t('contact.category')}</span>
+                    <h1 className="serif contact-title">{t('contact.title')} <br /> <span className="italic">{t('contact.highlight')}</span></h1>
+                    <p className="contact-desc">
+                        {t('contact.desc')}
                     </p>
 
-                    <div className="info-item">
-                        <span className="info-icon">📍</span>
-                        <div>
-                            <h3>Address</h3>
-                            <p>123 Artisan Way, Creative District<br />Marrakech, Morocco</p>
+                    <div className="contact-methods">
+                        <div className="method">
+                            <MapPin size={20} color="#d4af37" />
+                            <div>
+                                <h4 className="serif">{t('contact.hq')}</h4>
+                                <p>127 Artisan Way, Geneva, CH</p>
+                            </div>
+                        </div>
+                        <div className="method">
+                            <Mail size={20} color="#d4af37" />
+                            <div>
+                                <h4 className="serif">{t('contact.digital')}</h4>
+                                <p>curator@artisantreasures.com</p>
+                            </div>
+                        </div>
+                        <div className="method">
+                            <Phone size={20} color="#d4af37" />
+                            <div>
+                                <h4 className="serif">{t('contact.line')}</h4>
+                                <p>+41 (0) 22 789 45 12</p>
+                            </div>
                         </div>
                     </div>
+                </motion.div>
 
-                    <div className="info-item">
-                        <span className="info-icon">📧</span>
-                        <div>
-                            <h3>Email</h3>
-                            <p>hello@artisantreasures.com</p>
-                        </div>
-                    </div>
-
-                    <div className="info-item">
-                        <span className="info-icon">📞</span>
-                        <div>
-                            <h3>Phone</h3>
-                            <p>+1 (555) 123-4567</p>
-                        </div>
-                    </div>
-
-                    <div className="social-links">
-                        <a href="#" className="social-link">Instagram</a>
-                        <a href="#" className="social-link">Twitter</a>
-                        <a href="#" className="social-link">Facebook</a>
-                    </div>
-                </div>
-
-                <div className="contact-form-card">
-                    <h2>Send a Message</h2>
-                    {status === 'success' && (
-                        <div className="success-message">
-                            Thank you! Your message has been sent successfully. We'll be in touch soon.
-                        </div>
-                    )}
-
-                    <form onSubmit={handleSubmit}>
-                        <div className="form-group">
-                            <label htmlFor="name" className="form-label">Name</label>
-                            <input
-                                type="text"
-                                id="name"
-                                name="name"
-                                className="form-input"
-                                value={formData.name}
-                                onChange={handleChange}
-                                required
-                                placeholder="Your name"
-                            />
-                        </div>
-
-                        <div className="form-group">
-                            <label htmlFor="email" className="form-label">Email</label>
-                            <input
-                                type="email"
-                                id="email"
-                                name="email"
-                                className="form-input"
-                                value={formData.email}
-                                onChange={handleChange}
-                                required
-                                placeholder="your@email.com"
-                            />
-                        </div>
-
-                        <div className="form-group">
-                            <label htmlFor="subject" className="form-label">Subject</label>
-                            <input
-                                type="text"
-                                id="subject"
-                                name="subject"
-                                className="form-input"
-                                value={formData.subject}
-                                onChange={handleChange}
-                                required
-                                placeholder="What is this regarding?"
-                            />
-                        </div>
-
-                        <div className="form-group">
-                            <label htmlFor="message" className="form-label">Message</label>
-                            <textarea
-                                id="message"
-                                name="message"
-                                className="form-textarea"
-                                value={formData.message}
-                                onChange={handleChange}
-                                required
-                                placeholder="Write your message here..."
-                                rows="5"
-                            ></textarea>
-                        </div>
-
-                        <button
-                            type="submit"
-                            className="submit-btn"
-                            disabled={status === 'submitting'}
-                        >
-                            {status === 'submitting' ? 'Sending...' : 'Send Message'}
-                        </button>
-                    </form>
-                </div>
+                <motion.div
+                    initial={{ opacity: 0, x: 30 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    className="contact-form-block glass-panel"
+                >
+                    <AnimatePresence mode="wait">
+                        {!submitted ? (
+                            <motion.form
+                                key="form"
+                                exit={{ opacity: 0, y: -20 }}
+                                onSubmit={handleSubmit}
+                                className="contact-form-premium"
+                            >
+                                <div className="input-group-premium">
+                                    <label className="serif">{t('contact.form.name')}</label>
+                                    <input
+                                        type="text"
+                                        required
+                                        value={formData.name}
+                                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                        placeholder="Ex: Alexander Art"
+                                    />
+                                </div>
+                                <div className="input-group-premium">
+                                    <label className="serif">{t('contact.form.email')}</label>
+                                    <input
+                                        type="email"
+                                        required
+                                        value={formData.email}
+                                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                                        placeholder="curator@example.com"
+                                    />
+                                </div>
+                                <div className="input-group-premium">
+                                    <label className="serif">{t('contact.form.message')}</label>
+                                    <textarea
+                                        required
+                                        rows="5"
+                                        value={formData.message}
+                                        onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                                        placeholder={t('contact.form.placeholder')}
+                                    />
+                                </div>
+                                <button type="submit" className="btn-premium w-full" disabled={loading}>
+                                    {loading ? t('contact.form.transmitting') : <>{t('contact.form.submit')} <Send size={18} /></>}
+                                </button>
+                            </motion.form>
+                        ) : (
+                            <motion.div
+                                key="success"
+                                initial={{ opacity: 0, scale: 0.9 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                className="contact-success"
+                            >
+                                <div className="success-icon-ring small">
+                                    <CheckCircle size={40} color="#d4af37" />
+                                </div>
+                                <h2 className="serif">{t('contact.form.success')}</h2>
+                                <p>{t('contact.form.successDesc')}</p>
+                                <button className="btn-premium" onClick={() => setSubmitted(false)}>{t('contact.form.another')}</button>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+                </motion.div>
             </div>
         </div>
     )

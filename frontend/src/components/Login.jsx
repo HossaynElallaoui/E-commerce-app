@@ -1,97 +1,114 @@
-import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import './Login.css';
+import { useState } from 'react'
+import { useNavigate, Link } from 'react-router-dom'
+import { motion } from 'framer-motion'
+import { LogIn, User, Lock, AlertCircle, Loader2, Sparkles } from 'lucide-react'
+import { useAuth } from '../context/AuthContext'
+import { useLanguage } from '../context/LanguageContext'
+import './Login.css'
 
 function Login() {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
-  const navigate = useNavigate();
+  const [formData, setFormData] = useState({ username: '', password: '' })
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+  const { login } = useAuth()
+  const { t } = useLanguage()
+  const navigate = useNavigate()
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
-    setLoading(true);
-
-    const result = await login(username, password);
-
-    if (result.success) {
-      // Redirect based on user role
-      if (result.user.role === 'admin') {
-        navigate('/admin');
+    e.preventDefault()
+    setLoading(true)
+    setError('')
+    try {
+      const result = await login(formData.username, formData.password)
+      if (result.success) {
+        navigate('/')
       } else {
-        navigate('/');
+        setError(result.error)
       }
-    } else {
-      setError(result.error);
+    } catch (err) {
+      setError('Invalid credentials')
+    } finally {
+      setLoading(false)
     }
-
-    setLoading(false);
-  };
+  }
 
   return (
-    <div className="login-container">
-      <div className="login-card">
-        <h1 className="login-title">Login</h1>
-        <p className="login-subtitle">Welcome back! Please login to your account.</p>
+    <div className="auth-page">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+        className="auth-container glass-panel"
+      >
+        <div className="auth-header">
+          <div className="auth-icon-seal">
+            <Sparkles size={32} color="#d4af37" />
+          </div>
+          <h1 className="serif">{t('login.title')}</h1>
+          <p className="auth-subtitle">Access your private collection</p>
+        </div>
 
-        {error && <div className="error-message">{error}</div>}
-
-        <form onSubmit={handleSubmit} className="login-form">
-          <div className="form-group">
-            <label htmlFor="username" className="form-label">
-              Username
-            </label>
-            <input
-              type="text"
-              id="username"
-              className="form-input"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              required
-              placeholder="Enter your username"
-            />
+        <form onSubmit={handleSubmit} className="auth-form">
+          <div className="input-group-premium">
+            <label className="serif">{t('login.username')}</label>
+            <div className="input-wrapper">
+              <User size={18} className="input-icon" />
+              <input
+                type="text"
+                required
+                value={formData.username}
+                onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                placeholder="Ex: ArtCollector_99"
+              />
+            </div>
           </div>
 
-          <div className="form-group">
-            <label htmlFor="password" className="form-label">
-              Password
-            </label>
-            <input
-              type="password"
-              id="password"
-              className="form-input"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              placeholder="Enter your password"
-            />
+          <div className="input-group-premium">
+            <label className="serif">{t('login.password')}</label>
+            <div className="input-wrapper">
+              <Lock size={18} className="input-icon" />
+              <input
+                type="password"
+                required
+                value={formData.password}
+                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                placeholder="••••••••"
+              />
+            </div>
           </div>
 
-          <button
-            type="submit"
-            className="login-btn"
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            className="btn-premium w-full"
             disabled={loading}
           >
-            {loading ? 'Logging in...' : 'Login'}
-          </button>
+            {loading ? <Loader2 className="animate-spin mx-auto" size={20} /> : t('login.button')}
+          </motion.button>
         </form>
 
-        <div className="login-footer">
+        {error && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="auth-error"
+          >
+            <AlertCircle size={16} />
+            <span>{error}</span>
+          </motion.div>
+        )}
+
+        <div className="auth-footer">
           <p>
-            Don't have an account? <Link to="/register">Register here</Link>
-          </p>
-          <p className="admin-note">
-            Admin? Use username: <strong>admin</strong> / password: <strong>admin123</strong>
+            {t('login.noAccount')}{' '}
+            <Link to="/register" className="gold-text-link serif italic">
+              {t('login.register')}
+            </Link>
           </p>
         </div>
-      </div>
+      </motion.div>
     </div>
-  );
+  )
 }
 
-export default Login;
-
+export default Login

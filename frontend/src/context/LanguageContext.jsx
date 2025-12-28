@@ -1,5 +1,5 @@
 import { createContext, useState, useContext, useEffect } from 'react';
-import { translations } from '../translations';
+import { translations } from '../translations/index.js';
 
 const LanguageContext = createContext();
 
@@ -8,24 +8,27 @@ export const LanguageProvider = ({ children }) => {
 
     useEffect(() => {
         localStorage.setItem('language', language);
-        // Update document direction for Arabic
         document.documentElement.dir = language === 'ar' ? 'rtl' : 'ltr';
         document.documentElement.lang = language;
     }, [language]);
 
     const t = (path) => {
-        const keys = path.split('.');
-        let current = translations[language];
+        try {
+            const keys = path.split('.');
+            let current = translations[language] || translations['en'];
 
-        for (const key of keys) {
-            if (current[key] === undefined) {
-                console.warn(`Translation missing for key: ${path} in language: ${language}`);
-                return path;
+            for (const key of keys) {
+                if (!current || current[key] === undefined) {
+                    console.warn(`Translation missing for key: ${path} in language: ${language}`);
+                    return path;
+                }
+                current = current[key];
             }
-            current = current[key];
+            return current;
+        } catch (e) {
+            console.error("Translation function error:", e);
+            return path;
         }
-
-        return current;
     };
 
     return (

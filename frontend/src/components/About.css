@@ -1,146 +1,141 @@
 .about-page {
-    width: 100%;
-    padding-bottom: 4rem;
+    padding-top: 140px;
+    padding-bottom: 100px;
 }
 
-.about-hero {
+.editorial-header {
     text-align: center;
-    padding: 4rem 2rem;
-    background-color: var(--surface);
-    border-radius: var(--radius-lg);
-    margin-bottom: 4rem;
-    box-shadow: var(--shadow-sm);
+    margin-bottom: 80px;
 }
 
-.about-title {
-    font-size: 3rem;
-    color: var(--secondary);
-    margin-bottom: 1rem;
-}
-
-.about-subtitle {
-    font-size: 1.25rem;
-    color: var(--text-muted);
-    font-weight: 500;
-}
-
-.about-section {
-    display: flex;
-    align-items: center;
-    gap: 4rem;
-    margin-bottom: 6rem;
-}
-
-.about-section.reverse {
-    flex-direction: row-reverse;
-}
-
-.about-text {
-    flex: 1;
-}
-
-.about-text h2 {
-    font-size: 2rem;
-    margin-bottom: 1.5rem;
-    color: var(--secondary);
-    position: relative;
-    display: inline-block;
-}
-
-.about-text h2::after {
-    content: '';
+.editorial-category {
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.3em;
     display: block;
-    width: 40px;
-    height: 3px;
-    background-color: var(--primary);
-    margin-top: 0.5rem;
+    margin-bottom: 24px;
+}
+
+.editorial-title {
+    font-size: 5rem;
+    line-height: 1.1;
+}
+
+.journal-story {
+    margin-bottom: 120px;
+}
+
+.journal-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 80px;
+    align-items: center;
+}
+
+.journal-text h2 {
+    font-size: 2.2rem;
+    margin-bottom: 32px;
+    color: var(--accent);
+}
+
+.journal-text p {
+    font-size: 1.15rem;
+    line-height: 1.9;
+    color: var(--text-muted);
+    margin-bottom: 24px;
+}
+
+.journal-visual {
+    padding: 20px;
+    border-radius: 4px;
+}
+
+.journal-visual img {
+    width: 100%;
+    aspect-ratio: 16/10;
+    object-fit: cover;
     border-radius: 2px;
 }
 
-.about-text p {
-    font-size: 1.1rem;
+.img-caption {
+    margin-top: 16px;
     color: var(--text-muted);
-    margin-bottom: 1.5rem;
-    line-height: 1.8;
+    font-size: 0.9rem;
+    text-align: right;
 }
 
-.about-image-container {
-    flex: 1;
-    position: relative;
+/* Stats */
+.impact-stats {
+    margin-bottom: 120px;
 }
 
-.about-image {
-    width: 100%;
-    height: 400px;
-    object-fit: cover;
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-md);
-    transition: var(--transition);
-}
-
-.about-image:hover {
-    transform: translateY(-5px);
-    box-shadow: var(--shadow-lg);
-}
-
-.values-section {
-    text-align: center;
-    margin-top: 4rem;
-}
-
-.values-section h2 {
-    font-size: 2.5rem;
-    margin-bottom: 3rem;
-    color: var(--secondary);
-}
-
-.values-grid {
+.stats-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 2rem;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px;
 }
 
-.value-card {
-    background: var(--surface);
-    padding: 2.5rem;
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-sm);
-    transition: var(--transition);
-    border: 1px solid rgba(0, 0, 0, 0.03);
+.stat-card {
+    text-align: center;
+    padding: 40px;
+    border: 1px solid var(--border-subtle);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.02);
 }
 
-.value-card:hover {
-    transform: translateY(-10px);
-    box-shadow: var(--shadow-hover);
+.stat-icon {
+    color: var(--accent);
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
 }
 
-.value-icon {
+.stat-value {
     font-size: 3rem;
-    margin-bottom: 1.5rem;
+    margin-bottom: 8px;
+    color: white;
 }
 
-.value-card h3 {
-    font-size: 1.5rem;
-    margin-bottom: 1rem;
-    color: var(--secondary);
-}
-
-.value-card p {
+.stat-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
     color: var(--text-muted);
-    line-height: 1.6;
+    font-weight: 700;
 }
 
-@media (max-width: 768px) {
-    .about-section {
-        flex-direction: column;
-        gap: 2rem;
-    }
+/* Manifesto */
+.manifesto-section {
+    padding: 0 20px;
+}
 
-    .about-section.reverse {
-        flex-direction: column;
-    }
+.manifesto-box {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 80px 40px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 32px;
+}
 
-    .about-title {
-        font-size: 2.5rem;
-    }
+.manifesto-box h2 {
+    font-size: 2.5rem;
+    font-style: italic;
+}
+
+.manifesto-box p {
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+@media (max-width: 992px) {
+    .editorial-title { font-size: 3rem; }
+    .journal-grid { grid-template-columns: 1fr; gap: 40px; }
+    .stats-grid { grid-template-columns: 1fr; }
 }

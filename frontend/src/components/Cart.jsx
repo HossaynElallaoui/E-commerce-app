@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { motion, AnimatePresence } from 'framer-motion'
+import { ShoppingCart, Trash2, Plus, Minus, ArrowRight, ShoppingBag, Loader2, ShieldCheck } from 'lucide-react'
+import { Link, useNavigate } from 'react-router-dom'
 import { api } from '../services/api'
 import { getProductImage } from '../utils/imageMapper'
 import { useLanguage } from '../context/LanguageContext'
@@ -8,9 +10,8 @@ import './Cart.css'
 function Cart() {
   const [cartItems, setCartItems] = useState([])
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
-  const navigate = useNavigate()
   const { t } = useLanguage()
+  const navigate = useNavigate()
 
   useEffect(() => {
     fetchCart()
@@ -18,129 +19,147 @@ function Cart() {
 
   const fetchCart = async () => {
     try {
-      setLoading(true)
       const response = await api.getCart()
-      setCartItems(response.data)
-      setError(null)
-    } catch (err) {
-      setError('Failed to load cart. Please try again later.')
-      console.error('Error fetching cart:', err)
+      setCartItems(response.data || [])
+    } catch (error) {
+      console.error('Failed to fetch cart:', error)
+      setCartItems([])
     } finally {
       setLoading(false)
     }
   }
 
-  const handleUpdateQuantity = async (id, newQuantity) => {
-    if (newQuantity < 1) {
-      handleRemoveItem(id)
-      return
-    }
+  const updateQuantity = async (productId, delta) => {
+    const item = cartItems.find(i => i.product_id === productId)
+    if (!item) return
+    const newQuantity = item.quantity + delta
+    if (newQuantity < 1) return
 
     try {
-      await api.updateCartItem(id, newQuantity)
+      await api.updateCartItem(productId, newQuantity)
       fetchCart()
-    } catch (err) {
-      alert('Failed to update quantity. Please try again.')
-      console.error('Error updating cart:', err)
+    } catch (error) {
+      console.error('Failed to update cart:', error)
     }
   }
 
-  const handleRemoveItem = async (id) => {
+  const removeItem = async (itemId) => {
     try {
-      await api.removeFromCart(id)
+      await api.removeFromCart(itemId)
       fetchCart()
-    } catch (err) {
-      alert('Failed to remove item. Please try again.')
-      console.error('Error removing from cart:', err)
+    } catch (error) {
+      console.error('Failed to remove item:', error)
     }
   }
 
-  const calculateTotal = () => {
-    return cartItems.reduce((sum, item) => sum + (parseFloat(item.price) * item.quantity), 0)
-  }
+  const totalPrice = cartItems.reduce((sum, item) => sum + (item.price || 0) * (item.quantity || 0), 0)
 
-  if (loading) {
-    return <div className="loading">Loading cart...</div>
-  }
+  if (loading) return (
+    <div className="cart-empty-state">
+      <Loader2 className="animate-spin" size={48} color="#d4af37" />
+    </div>
+  )
 
-  if (error) {
-    return <div className="error-message">{error}</div>
-  }
-
-  if (cartItems.length === 0) {
-    return (
-      <div className="empty-cart">
-        <h2>{t('cart.empty')}</h2>
-        <button className="continue-btn" onClick={() => navigate('/')}>
-          {t('cart.continue')}
-        </button>
-      </div>
-    )
-  }
+  if (cartItems.length === 0) return (
+    <div className="cart-empty-state">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="glass-panel empty-card"
+      >
+        <ShoppingBag size={64} color="#d4af37" style={{ marginBottom: '24px', opacity: 0.5 }} />
+        <h2 className="serif">Your treasure chest is empty</h2>
+        <p>Return to our collection to find your next masterpiece.</p>
+        <Link to="/" className="btn-premium" style={{ textDecoration: 'none', display: 'inline-block', marginTop: '32px' }}>
+          Explore Collection
+        </Link>
+      </motion.div>
+    </div>
+  )
 
   return (
-    <div className="cart-container">
-      <h1 className="cart-header">{t('cart.title')}</h1>
-      {cartItems.map(item => (
-        <div key={item.id} className="cart-item">
-          <img
-            src={getProductImage(item.name, item.image_url)}
-            alt={item.name}
-            className="cart-item-image"
-            onError={(e) => {
-              e.target.src = 'https://via.placeholder.com/300';
-            }}
-          />
-          <div className="cart-item-details">
-            <h3 className="cart-item-name">{item.name}</h3>
-            <p className="cart-item-price">${parseFloat(item.price).toFixed(2)} each</p>
-            <div className="quantity-controls">
-              <button
-                className="quantity-btn"
-                onClick={() => handleUpdateQuantity(item.id, item.quantity - 1)}
-              >
-                −
-              </button>
-              <input
-                type="number"
-                className="quantity-input"
-                value={item.quantity}
-                onChange={(e) => handleUpdateQuantity(item.id, parseInt(e.target.value) || 1)}
-                min="1"
-              />
-              <button
-                className="quantity-btn"
-                onClick={() => handleUpdateQuantity(item.id, item.quantity + 1)}
-              >
-                +
-              </button>
-              <button
-                className="remove-btn"
-                onClick={() => handleRemoveItem(item.id)}
-              >
-                ✕
-              </button>
-            </div>
-          </div>
-          <div className="cart-item-total">
-            ${(parseFloat(item.price) * item.quantity).toFixed(2)}
-          </div>
+    <div className="cart-page max-width-container">
+      <motion.div
+        initial={{ opacity: 0, x: -30 }}
+        animate={{ opacity: 1, x: 0 }}
+        className="cart-main"
+      >
+        <div className="cart-header-luxury">
+          <h1 className="serif">{t('cart.title')}</h1>
+          <span className="cart-count-badge serif">{cartItems.length} {cartItems.length === 1 ? 'Object' : 'Objects'}</span>
         </div>
-      ))}
-      <div className="cart-summary">
-        <div className="cart-total">
-          {t('cart.total')}: ${calculateTotal().toFixed(2)}
+
+        <div className="cart-items-list">
+          <AnimatePresence mode='popLayout'>
+            {cartItems.map((item) => (
+              <motion.div
+                key={item.product_id}
+                layout
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                className="cart-item-luxury glass-panel"
+              >
+                <div className="item-image-shell">
+                  <img src={getProductImage(item.name)} alt={item.name} />
+                </div>
+
+                <div className="item-details">
+                  <h3 className="serif">{item.name}</h3>
+                  <p className="item-category">Handcrafted Artifact</p>
+                  <div className="item-controls">
+                    <div className="qty-picker-premium">
+                      <button onClick={() => updateQuantity(item.product_id, -1)}><Minus size={14} /></button>
+                      <span className="serif">{item.quantity}</span>
+                      <button onClick={() => updateQuantity(item.product_id, 1)}><Plus size={14} /></button>
+                    </div>
+                    <button className="remove-btn-luxury" onClick={() => removeItem(item.id)}>
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+                </div>
+
+                <div className="item-price-block">
+                  <span className="serif price-tag">${((item.price || 0) * (item.quantity || 0)).toFixed(2)}</span>
+                </div>
+              </motion.div>
+            ))}
+          </AnimatePresence>
         </div>
+      </motion.div>
+
+      <motion.aside
+        initial={{ opacity: 0, x: 30 }}
+        animate={{ opacity: 1, x: 0 }}
+        className="cart-summary-luxury glass-panel"
+      >
+        <h2 className="serif summary-title">Investment Summary</h2>
+        <div className="summary-row">
+          <span>Subtotal</span>
+          <span className="serif">${totalPrice.toFixed(2)}</span>
+        </div>
+        <div className="summary-row">
+          <span>Shipment (Global)</span>
+          <span className="gold-text serif">Complimentary</span>
+        </div>
+        <div className="summary-divider"></div>
+        <div className="summary-row total">
+          <span className="serif">Total Investment</span>
+          <span className="serif total-price">${totalPrice.toFixed(2)}</span>
+        </div>
+
         <button
-          className="checkout-btn"
+          className="btn-premium w-full checkout-btn"
           onClick={() => navigate('/checkout')}
         >
-          {t('cart.checkout')}
+          Secure Checkout <ArrowRight size={18} />
         </button>
-      </div>
+        <p className="secure-note">
+          <ShieldCheck size={14} /> Artisanal Insurance Included
+        </p>
+      </motion.aside>
     </div>
   )
 }
 
 export default Cart
-

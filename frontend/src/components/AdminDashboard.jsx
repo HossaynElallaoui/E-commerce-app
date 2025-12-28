@@ -3,6 +3,20 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../services/api';
 import { getProductImage } from '../utils/imageMapper';
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+  Package,
+  ShoppingBag,
+  Plus,
+  Trash2,
+  Edit3,
+  ExternalLink,
+  LogOut,
+  Settings,
+  TrendingUp,
+  Box,
+  Clock
+} from 'lucide-react';
 import './AdminDashboard.css';
 
 function AdminDashboard() {
@@ -71,10 +85,8 @@ function AdminDashboard() {
       });
       resetForm();
       fetchData();
-      alert('Product created successfully!');
     } catch (err) {
-      alert('Failed to create product. Please try again.');
-      console.error('Error creating product:', err);
+      alert('Failed to create product.');
     }
   };
 
@@ -90,10 +102,8 @@ function AdminDashboard() {
       });
       resetForm();
       fetchData();
-      alert('Product updated successfully!');
     } catch (err) {
-      alert('Failed to update product. Please try again.');
-      console.error('Error updating product:', err);
+      alert('Failed to update product.');
     }
   };
 
@@ -110,17 +120,12 @@ function AdminDashboard() {
   };
 
   const handleDeleteProduct = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this product?')) {
-      return;
-    }
-
+    if (!window.confirm('Archive this treasure from the collection?')) return;
     try {
       await api.deleteProduct(id);
       fetchData();
-      alert('Product deleted successfully!');
     } catch (err) {
-      alert('Failed to delete product. Please try again.');
-      console.error('Error deleting product:', err);
+      alert('Failed to delete product.');
     }
   };
 
@@ -128,10 +133,8 @@ function AdminDashboard() {
     try {
       await api.updateOrderStatus(orderId, newStatus);
       fetchData();
-      alert('Order status updated successfully!');
     } catch (err) {
-      alert('Failed to update order status. Please try again.');
-      console.error('Error updating order status:', err);
+      alert('Failed to update order status.');
     }
   };
 
@@ -148,217 +151,245 @@ function AdminDashboard() {
   };
 
   if (loading) {
-    return <div className="loading">Loading dashboard...</div>;
+    return (
+      <div className="admin-loading-screen">
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+          className="admin-loader"
+        />
+        <p className="serif">Accessing Curator's Command...</p>
+      </div>
+    );
   }
 
   return (
-    <div className="admin-dashboard">
-      <div className="admin-header">
-        <h1>Admin Dashboard</h1>
-        <div className="admin-actions">
-          <span className="welcome-text">Welcome, {user?.username}!</span>
-          <button className="logout-btn" onClick={() => { logout(); navigate('/'); }}>
-            Logout
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      className="admin-dashboard-container"
+    >
+      <div className="curator-sidebar">
+        <div className="sidebar-brand">
+          <div className="brand-icon-gold">
+            <Settings size={24} />
+          </div>
+          <h2 className="serif">Command</h2>
+        </div>
+
+        <nav className="sidebar-nav">
+          <button
+            className={`nav-item ${activeTab === 'products' ? 'active' : ''}`}
+            onClick={() => setActiveTab('products')}
+          >
+            <Package size={20} />
+            <span>Collection</span>
+          </button>
+          <button
+            className={`nav-item ${activeTab === 'orders' ? 'active' : ''}`}
+            onClick={() => setActiveTab('orders')}
+          >
+            <ShoppingBag size={20} />
+            <span>Acquisitions</span>
+          </button>
+        </nav>
+
+        <div className="sidebar-footer">
+          <button className="sidebar-logout" onClick={() => { logout(); navigate('/'); }}>
+            <LogOut size={18} />
+            <span>Resign</span>
           </button>
         </div>
       </div>
 
-      {error && <div className="error-message">{error}</div>}
-
-      <div className="admin-tabs">
-        <button
-          className={`tab-btn ${activeTab === 'products' ? 'active' : ''}`}
-          onClick={() => setActiveTab('products')}
-        >
-          Products
-        </button>
-        <button
-          className={`tab-btn ${activeTab === 'orders' ? 'active' : ''}`}
-          onClick={() => setActiveTab('orders')}
-        >
-          Orders
-        </button>
-      </div>
-
-      {activeTab === 'products' && (
-        <div className="products-section">
-          <div className="section-header">
-            <h2>Manage Products</h2>
-            <button
-              className="add-product-btn"
-              onClick={() => {
-                resetForm();
-                setShowProductForm(true);
-              }}
-            >
-              + Add New Product
-            </button>
+      <main className="admin-main-content">
+        <header className="admin-view-header">
+          <div className="header-labels">
+            <span className="subtitle gold-text">Curator Privileges</span>
+            <h1 className="serif">
+              {activeTab === 'products' ? 'Master Collection' : 'Member Acquisitions'}
+            </h1>
           </div>
 
-          {showProductForm && (
-            <div className="product-form-card">
-              <h3>{editingProduct ? 'Edit Product' : 'Add New Product'}</h3>
-              <form onSubmit={editingProduct ? handleUpdateProduct : handleCreateProduct}>
-                <div className="form-row">
-                  <div className="form-group">
-                    <label>Product Name *</label>
-                    <input
-                      type="text"
-                      name="name"
-                      value={formData.name}
-                      onChange={handleInputChange}
-                      required
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>Price *</label>
-                    <input
-                      type="number"
-                      step="0.01"
-                      name="price"
-                      value={formData.price}
-                      onChange={handleInputChange}
-                      required
-                    />
-                  </div>
-                </div>
-                <div className="form-group">
-                  <label>Description</label>
-                  <textarea
-                    name="description"
-                    value={formData.description}
-                    onChange={handleInputChange}
-                    rows="3"
-                  />
-                </div>
-                <div className="form-row">
-                  <div className="form-group">
-                    <label>Image URL</label>
-                    <input
-                      type="url"
-                      name="image_url"
-                      value={formData.image_url}
-                      onChange={handleInputChange}
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>Stock</label>
-                    <input
-                      type="number"
-                      name="stock"
-                      value={formData.stock}
-                      onChange={handleInputChange}
-                      min="0"
-                    />
-                  </div>
-                </div>
-                <div className="form-actions">
-                  <button type="submit" className="save-btn">
-                    {editingProduct ? 'Update Product' : 'Create Product'}
-                  </button>
-                  <button type="button" className="cancel-btn" onClick={resetForm}>
-                    Cancel
-                  </button>
-                </div>
-              </form>
+          <div className="admin-brief-stats">
+            <div className="stat-pill glass-panel">
+              <Box size={14} className="gold-text" />
+              <span>{products.length} Treasures</span>
             </div>
-          )}
+            <div className="stat-pill glass-panel">
+              <TrendingUp size={14} className="gold-text" />
+              <span>{orders.length} Orders</span>
+            </div>
+          </div>
+        </header>
 
-          <div className="products-grid">
-            {products.map(product => (
-              <div key={product.id} className="admin-product-card">
-                <img
-                  src={getProductImage(product.name, product.image_url)}
-                  alt={product.name}
-                  className="admin-product-image"
-                  onError={(e) => {
-                    e.target.src = 'https://via.placeholder.com/300';
-                  }}
-                />
-                <div className="admin-product-info">
-                  <h3>{product.name}</h3>
-                  <p className="product-description">{product.description}</p>
-                  <div className="product-details">
-                    <span className="product-price">${parseFloat(product.price).toFixed(2)}</span>
-                    <span className="product-stock">Stock: {product.stock}</span>
-                  </div>
-                  <div className="product-actions">
-                    <button
-                      className="edit-btn"
-                      onClick={() => handleEditProduct(product)}
-                    >
-                      Edit
-                    </button>
-                    <button
-                      className="delete-btn"
-                      onClick={() => handleDeleteProduct(product.id)}
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </div>
+        {error && <div className="admin-error-banner">{error}</div>}
+
+        <AnimatePresence mode="wait">
+          {activeTab === 'products' ? (
+            <motion.div
+              key="products"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="collection-view"
+            >
+              <div className="view-actions">
+                <button
+                  className="btn-premium action-add"
+                  onClick={() => setShowProductForm(true)}
+                >
+                  <Plus size={18} />
+                  <span>New Acquisition</span>
+                </button>
               </div>
-            ))}
-          </div>
-        </div>
-      )}
 
-      {activeTab === 'orders' && (
-        <div className="orders-section">
-          <h2>All Orders</h2>
-          <div className="orders-table">
-            <table>
-              <thead>
-                <tr>
-                  <th>Order ID</th>
-                  <th>Customer</th>
-                  <th>Email</th>
-                  <th>Total</th>
-                  <th>Status</th>
-                  <th>Date</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {orders.map(order => (
-                  <tr key={order.id}>
-                    <td>#{order.id}</td>
-                    <td>{order.customer_name}</td>
-                    <td>{order.customer_email}</td>
-                    <td>${parseFloat(order.total_amount).toFixed(2)}</td>
-                    <td>
-                      <select
-                        value={order.status}
-                        onChange={(e) => handleUpdateOrderStatus(order.id, e.target.value)}
-                        className="status-select"
-                      >
-                        <option value="pending">Pending</option>
-                        <option value="processing">Processing</option>
-                        <option value="shipped">Shipped</option>
-                        <option value="delivered">Delivered</option>
-                        <option value="cancelled">Cancelled</option>
-                      </select>
-                    </td>
-                    <td>{new Date(order.created_at).toLocaleDateString()}</td>
-                    <td>
-                      <button
-                        className="view-btn"
-                        onClick={() => navigate(`/orders/${order.id}`)}
-                      >
-                        View
+              {showProductForm && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  className="product-curation-form glass-panel"
+                >
+                  <h3 className="serif">{editingProduct ? 'Refine Treasure' : 'Curate New Item'}</h3>
+                  <form onSubmit={editingProduct ? handleUpdateProduct : handleCreateProduct}>
+                    <div className="luxury-form-grid">
+                      <div className="input-field">
+                        <label>Item Name</label>
+                        <input name="name" value={formData.name} onChange={handleInputChange} required />
+                      </div>
+                      <div className="input-field">
+                        <label>Value ($)</label>
+                        <input type="number" step="0.01" name="price" value={formData.price} onChange={handleInputChange} required />
+                      </div>
+                      <div className="input-field full">
+                        <label>Provenance / Description</label>
+                        <textarea name="description" value={formData.description} onChange={handleInputChange} />
+                      </div>
+                      <div className="input-field">
+                        <label>Gallery URL</label>
+                        <input type="url" name="image_url" value={formData.image_url} onChange={handleInputChange} />
+                      </div>
+                      <div className="input-field">
+                        <label>Inventory Count</label>
+                        <input type="number" name="stock" value={formData.stock} onChange={handleInputChange} min="0" />
+                      </div>
+                    </div>
+                    <div className="form-submit-row">
+                      <button type="submit" className="btn-premium fill">
+                        {editingProduct ? 'Save Refinements' : 'Authorize Acquisition'}
                       </button>
-                    </td>
-                  </tr>
+                      <button type="button" className="btn-ghost" onClick={resetForm}>Cancel</button>
+                    </div>
+                  </form>
+                </motion.div>
+              )}
+
+              <div className="curation-grid">
+                {products.map((product, idx) => (
+                  <motion.div
+                    key={product.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: idx * 0.05 }}
+                    className="curation-item-card glass-panel"
+                  >
+                    <div className="item-preview">
+                      <img src={getProductImage(product.name, product.image_url)} alt={product.name} />
+                      <div className="item-status-overlay">
+                        <span className="stock-tag">{product.stock} in Vault</span>
+                      </div>
+                    </div>
+                    <div className="item-curation-info">
+                      <h4 className="serif">{product.name}</h4>
+                      <p className="item-price-gold">${parseFloat(product.price).toLocaleString()}</p>
+                      <div className="curation-actions">
+                        <button className="icon-action-gold" onClick={() => handleEditProduct(product)}>
+                          <Edit3 size={16} />
+                        </button>
+                        <button className="icon-action-red" onClick={() => handleDeleteProduct(product.id)}>
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    </div>
+                  </motion.div>
                 ))}
-              </tbody>
-            </table>
-            {orders.length === 0 && (
-              <p className="no-orders">No orders yet.</p>
-            )}
-          </div>
-        </div>
-      )}
-    </div>
+              </div>
+            </motion.div>
+          ) : (
+            <motion.div
+              key="orders"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="acquisitions-view"
+            >
+              <div className="luxury-table-container glass-panel">
+                <table className="luxury-table">
+                  <thead>
+                    <tr>
+                      <th className="serif">Ref</th>
+                      <th className="serif">Acquired By</th>
+                      <th className="serif">Investment</th>
+                      <th className="serif">Condition</th>
+                      <th className="serif">Date</th>
+                      <th className="serif">Details</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {orders.map((order, idx) => (
+                      <motion.tr
+                        key={order.id}
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: idx * 0.03 }}
+                      >
+                        <td className="gold-text">#{order.id}</td>
+                        <td className="member-cell">
+                          <span className="member-name">{order.customer_name}</span>
+                          <span className="member-email">{order.customer_email}</span>
+                        </td>
+                        <td className="price-cell">${parseFloat(order.total_amount).toLocaleString()}</td>
+                        <td>
+                          <div className="status-dropdown-container">
+                            <select
+                              value={order.status}
+                              onChange={(e) => handleUpdateOrderStatus(order.id, e.target.value)}
+                              className={`luxury-status-select status-${order.status}`}
+                            >
+                              <option value="pending">Pending</option>
+                              <option value="processing">Processing</option>
+                              <option value="shipped">Shipped</option>
+                              <option value="delivered">Delivered</option>
+                              <option value="cancelled">Cancelled</option>
+                            </select>
+                            <Clock size={12} className="status-clock" />
+                          </div>
+                        </td>
+                        <td className="date-cell">{new Date(order.created_at).toLocaleDateString()}</td>
+                        <td>
+                          <button
+                            className="btn-view-treasure"
+                            onClick={() => navigate(`/orders/${order.id}`)}
+                          >
+                            <ExternalLink size={16} />
+                          </button>
+                        </td>
+                      </motion.tr>
+                    ))}
+                  </tbody>
+                </table>
+                {orders.length === 0 && (
+                  <div className="empty-vault">
+                    <ShoppingBag size={48} className="muted-icon" />
+                    <p className="serif">No acquisitions recorded yet.</p>
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </main>
+    </motion.div>
   );
 }
 

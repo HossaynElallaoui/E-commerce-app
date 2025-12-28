@@ -1,82 +1,97 @@
+import { motion } from 'framer-motion'
+import { Sparkles, Heart, Globe, Users } from 'lucide-react'
+import { useLanguage } from '../context/LanguageContext'
 import './About.css'
 
 function About() {
+    const { t } = useLanguage()
+
+    const stats = [
+        { icon: <Globe size={24} />, label: t('about.stats.artisans'), value: '250+' },
+        { icon: <Users size={24} />, label: t('about.stats.curators'), value: '12' },
+        { icon: <Heart size={24} />, label: t('about.stats.impact'), value: '100%' },
+    ]
+
     return (
         <div className="about-page">
-            <div className="about-hero">
-                <h1 className="about-title">Our Story</h1>
-                <p className="about-subtitle">Preserving Tradition, One Artifact at a Time</p>
-            </div>
+            {/* Editorial Header */}
+            <section className="editorial-header max-width-container">
+                <motion.span
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="editorial-category gold-text"
+                >
+                    {t('about.category')}
+                </motion.span>
+                <motion.h1
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2 }}
+                    className="serif editorial-title"
+                >
+                    {t('about.title')} <br />
+                    <span className="italic">{t('about.highlight')}</span>
+                </motion.h1>
+            </section>
 
-            <div className="about-content">
-                <section className="about-section">
-                    <div className="about-text">
-                        <h2>The Artisan Treasures Mission</h2>
-                        <p>
-                            At Artisan Treasures, we believe that every object tells a story. Our mission is to connect
-                            skilled artisans from around the world with people who appreciate the beauty of handcrafted
-                            goods. We are dedicated to preserving traditional craftsmanship that has been passed down
-                            through generations.
-                        </p>
-                        <p>
-                            In a world of mass production, we stand for the unique, the imperfect, and the human touch.
-                            Each item in our collection is hand-selected for its quality, authenticity, and the story
-                            it carries.
-                        </p>
-                    </div>
-                    <div className="about-image-container">
-                        <img
-                            src="https://images.unsplash.com/photo-1459411552884-841db9b3cc2a?auto=format&fit=crop&q=80&w=800"
-                            alt="Artisan working on pottery"
-                            className="about-image"
-                        />
-                    </div>
-                </section>
+            {/* Main Journal Story */}
+            <section className="journal-story max-width-container">
+                <div className="journal-grid">
+                    <motion.div
+                        initial={{ opacity: 0, x: -30 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        viewport={{ once: true }}
+                        className="journal-text"
+                    >
+                        <h2 className="serif">{t('about.promiseTitle')}</h2>
+                        <p>{t('about.promiseP1')}</p>
+                        <p>{t('about.promiseP2')}</p>
+                    </motion.div>
 
-                <section className="about-section reverse">
-                    <div className="about-text">
-                        <h2>Supporting Local Communities</h2>
-                        <p>
-                            We work directly with artisans, ensuring fair trade practices and sustainable livelihoods.
-                            By cutting out middlemen, we ensure that the creators receive fair compensation for their
-                            incredible work. Your purchase directly supports these communities and helps keep their
-                            traditions alive.
-                        </p>
-                        <p>
-                            From the souks of Morocco to the pottery workshops of Japan, we travel the globe to bring
-                            you the finest traditional goods.
-                        </p>
-                    </div>
-                    <div className="about-image-container">
-                        <img
-                            src="https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&q=80&w=800"
-                            alt="Traditional rug weaving"
-                            className="about-image"
-                        />
-                    </div>
-                </section>
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        whileInView={{ opacity: 1, scale: 1 }}
+                        viewport={{ once: true }}
+                        className="journal-visual glass-panel"
+                    >
+                        <img src="/images/hero-artisan.jpg" alt="Artisan working" />
+                        <div className="img-caption serif italic">{t('about.caption')}</div>
+                    </motion.div>
+                </div>
+            </section>
 
-                <section className="values-section">
-                    <h2>Our Core Values</h2>
-                    <div className="values-grid">
-                        <div className="value-card">
-                            <div className="value-icon">👐</div>
-                            <h3>Handcrafted</h3>
-                            <p>We celebrate the human touch in every product we offer.</p>
-                        </div>
-                        <div className="value-card">
-                            <div className="value-icon">🌍</div>
-                            <h3>Sustainable</h3>
-                            <p>We prioritize eco-friendly materials and ethical production methods.</p>
-                        </div>
-                        <div className="value-card">
-                            <div className="value-icon">🤝</div>
-                            <h3>Fair Trade</h3>
-                            <p>We ensure artisans are paid fairly for their skill and labor.</p>
-                        </div>
-                    </div>
-                </section>
-            </div>
+            {/* Stats Section */}
+            <section className="impact-stats max-width-container">
+                <div className="stats-grid">
+                    {stats.map((stat, idx) => (
+                        <motion.div
+                            key={idx}
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: idx * 0.1 }}
+                            className="stat-card"
+                        >
+                            <div className="stat-icon">{stat.icon}</div>
+                            <div className="stat-value serif">{stat.value}</div>
+                            <div className="stat-label">{stat.label}</div>
+                        </motion.div>
+                    ))}
+                </div>
+            </section>
+
+            {/* Closing Statement */}
+            <section className="manifesto-section">
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    whileInView={{ opacity: 1 }}
+                    className="manifesto-box glass-panel"
+                >
+                    <Sparkles color="#d4af37" size={32} />
+                    <h2 className="serif">"{t('about.manifesto')}"</h2>
+                    <p>{t('about.join')}</p>
+                </motion.div>
+            </section>
         </div>
     )
 }

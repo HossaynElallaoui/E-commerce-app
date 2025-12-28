@@ -1,5 +1,6 @@
-
 import { useState, useEffect } from 'react'
+import { motion, useScroll, useTransform } from 'framer-motion'
+import { ShoppingCart, ArrowRight, Loader2, AlertCircle, Sparkles, ShieldCheck, Heart } from 'lucide-react'
 import { api } from '../services/api'
 import { getProductImage } from '../utils/imageMapper'
 import { useLanguage } from '../context/LanguageContext'
@@ -20,133 +21,158 @@ function ProductList() {
     try {
       setLoading(true)
       const response = await api.getProducts()
-      // Log products for debugging
-      console.log('Products loaded:', response.data)
       setProducts(response.data)
       setError(null)
     } catch (err) {
-      const errorMessage = err.response?.status === 404 || err.code === 'ECONNREFUSED'
-        ? 'Backend server is not running. Please start the backend server on port 5000.'
-        : 'Failed to load products. Please try again later.'
-      setError(errorMessage)
-      console.error('Error fetching products:', err)
+      setError('Failed to load products.')
     } finally {
       setLoading(false)
     }
   }
 
-  const handleAddToCart = async (productId) => {
+  const handleAddToCart = async (product) => {
+    setAddingToCart(prev => ({ ...prev, [product.id]: true }))
     try {
-      setAddingToCart({ ...addingToCart, [productId]: true })
-      await api.addToCart(productId, 1)
-      // Show success feedback (you could add a toast notification here)
+      await api.addToCart(product.id, 1)
     } catch (err) {
-      alert('Failed to add item to cart. Please try again.')
-      console.error('Error adding to cart:', err)
+      console.error('Failed to add to cart:', err)
     } finally {
-      setAddingToCart({ ...addingToCart, [productId]: false })
+      setAddingToCart(prev => ({ ...prev, [product.id]: false }))
     }
   }
 
-  if (loading) {
-    return <div className="loading">{t('products.loading')}</div>
-  }
-
-  if (error) {
-    return (
-      <div className="products-page">
-        <div className="error-message" style={{ padding: '2rem', textAlign: 'center' }}>
-          <h2>⚠️ {t('common.error')}</h2>
-          <p style={{ marginTop: '1rem' }}>
-            {error}
-          </p>
-          <button
-            onClick={fetchProducts}
-            style={{
-              marginTop: '1rem',
-              padding: '0.75rem 1.5rem',
-              backgroundColor: '#3498db',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer'
-            }}
-          >
-            {t('common.retry')}
-          </button>
-        </div>
-      </div>
-    )
-  }
+  if (loading) return (
+    <div className="loading-overlay">
+      <motion.div
+        animate={{ scale: [1, 1.2, 1], opacity: [0.5, 1, 0.5] }}
+        transition={{ repeat: Infinity, duration: 2 }}
+        className="loader-content"
+      >
+        <Sparkles size={48} color="#d4af37" />
+        <p className="serif">{t('products.loading')}</p>
+      </motion.div>
+    </div>
+  )
 
   return (
-    <div className="products-page">
-      {/* Hero Section */}
-      <section className="hero-section">
-        <div className="hero-content">
-          <h1 className="hero-title">
-            {t('hero.title')} <br />
-            <span className="highlight">{t('hero.highlight')}</span>
-          </h1>
-          <p className="hero-subtitle">
-            {t('hero.subtitle')}
-          </p>
-          <button className="hero-cta-btn" onClick={() => document.getElementById('products').scrollIntoView({ behavior: 'smooth' })}>
-            {t('hero.cta')} →
-          </button>
+    <div className="artisan-container">
+      {/* Luxury Hero Section */}
+      <section className="luxury-hero">
+        <div className="hero-grid">
+          <motion.div
+            initial={{ opacity: 0, x: -30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 1.2, ease: "easeOut" }}
+            className="hero-text-block"
+          >
+            <span className="hero-tagline">{t('hero.certified')}</span>
+            <h1 className="hero-title serif">
+              {t('hero.title')} <br />
+              <span className="gold-text italic">{t('hero.highlight')}</span>
+            </h1>
+            <p className="hero-description">
+              {t('hero.subtitle')}
+            </p>
+            <div className="hero-actions">
+              <button className="btn-premium" onClick={() => document.getElementById('catalog')?.scrollIntoView({ behavior: 'smooth' })}>
+                {t('hero.cta')}
+              </button>
+            </div>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 1.5, ease: "easeOut" }}
+            className="hero-visual"
+          >
+            <div className="luxury-frame">
+              <img src="/images/hero-artisan.jpg" alt="Artisan Craft" className="hero-big-img" />
+              <div className="frame-border"></div>
+            </div>
+            <motion.div
+              animate={{ y: [0, -20, 0] }}
+              transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
+              className="floating-card"
+            >
+              <ShieldCheck color="#d4af37" size={20} />
+              <span>{t('hero.certified')}</span>
+            </motion.div>
+          </motion.div>
         </div>
-        <div className="hero-image-container">
-          <img src="/images/smartphone.jpeg" alt="Featured Artisan Product" className="hero-image" />
+        <div className="hero-overlay-gradient"></div>
+      </section>
+
+      {/* Narrative Story Section */}
+      <section className="narrative-section max-width-container">
+        <div className="narrative-grid">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="narrative-content"
+          >
+            <h2 className="serif">{t('narrative.title')}</h2>
+            <p>{t('narrative.desc')}</p>
+          </motion.div>
         </div>
       </section>
 
-      <h2 className="page-title" id="products">{t('products.title')}</h2>
-      {products.length === 0 && !loading ? (
-        <div style={{ textAlign: 'center', padding: '2rem' }}>
-          <p>{t('products.empty')}</p>
+      {/* Product Catalog */}
+      <section id="catalog" className="catalog-section max-width-container">
+        <div className="catalog-header">
+          <h2 className="serif gold-text">{t('products.title')}</h2>
+          <div className="catalog-line"></div>
         </div>
-      ) : (
-        <div className="products-container">
-          {products.map(product => (
-            <div key={product.id} className="product-card">
-              <img
-                src={getProductImage(product.name, product.image_url)}
-                alt={product.name}
-                className="product-image"
-                onError={(e) => {
-                  // Fallback if image fails to load
-                  console.error(`Failed to load image for ${product.name}: `, e.target.src);
-                  e.target.src = 'https://via.placeholder.com/300';
-                }}
-                onLoad={() => {
-                  console.log(`Image loaded successfully for ${product.name}`);
-                }}
-              />
-              <div className="product-info">
-                <h3 className="product-name">{product.name}</h3>
-                <p className="product-description">{product.description}</p>
-                <div className="product-footer">
-                  <span className="product-price">${parseFloat(product.price).toFixed(2)}</span>
-                  <button
-                    className="add-to-cart-btn"
-                    onClick={() => handleAddToCart(product.id)}
+
+        <div className="products-grid">
+          {products.map((product, idx) => (
+            <motion.div
+              key={product.id}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: idx * 0.1 }}
+              className="luxury-card"
+            >
+              <div className="card-image-wrapper">
+                <img src={getProductImage(product.name, product.image_url)} alt={product.name} />
+                <motion.button
+                  whileHover={{ scale: 1.1 }}
+                  className="wishlist-btn"
+                >
+                  <Heart size={18} />
+                </motion.button>
+              </div>
+
+              <div className="card-content">
+                <h3 className="serif">{product.name}</h3>
+                <p className="card-desc">{product.description}</p>
+                <div className="card-footer">
+                  <span className="price">${parseFloat(product.price).toFixed(2)}</span>
+                  <motion.button
+                    whileTap={{ scale: 0.95 }}
                     disabled={addingToCart[product.id] || parseInt(product.stock) === 0}
+                    onClick={() => handleAddToCart(product)}
+                    className="add-btn"
                   >
-                    {addingToCart[product.id]
-                      ? t('products.adding')
-                      : parseInt(product.stock) === 0
-                        ? t('products.outOfStock')
-                        : t('products.addToCart')}
-                  </button>
+                    {addingToCart[product.id] ? (
+                      <Loader2 size={16} className="animate-spin" />
+                    ) : (parseInt(product.stock) === 0 ? t('products.outOfStock') : (
+                      <>
+                        <span>{t('products.addToCart')}</span>
+                        <ShoppingCart size={14} />
+                      </>
+                    ))}
+                  </motion.button>
                 </div>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
-      )}
+      </section>
     </div>
   )
 }
 
 export default ProductList
-

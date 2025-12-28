@@ -1,54 +1,109 @@
-.not-found-container {
-    min-height: 70vh;
+.not-found-luxury {
+    min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
-    text-align: center;
+    background: #0a0a0b;
+    color: #f8f8f8;
+    position: relative;
+    overflow: hidden;
     padding: 2rem;
 }
 
 .not-found-content {
+    position: relative;
+    z-index: 10;
+    text-align: center;
     max-width: 600px;
-    animation: fadeIn 0.6s ease-out;
+}
+
+.error-visual {
+    margin-bottom: 3rem;
+    color: #d4af37;
+    opacity: 0.8;
 }
 
 .error-code {
-    font-size: 8rem;
-    font-weight: 800;
-    color: var(--primary);
-    line-height: 1;
-    margin-bottom: 1rem;
-    text-shadow: 4px 4px 0px rgba(188, 71, 73, 0.1);
+    font-size: 6rem;
+    letter-spacing: 0.1em;
+    margin-bottom: 0;
+    opacity: 0.9;
 }
 
 .error-title {
     font-size: 2.5rem;
-    color: var(--secondary);
     margin-bottom: 1.5rem;
+    letter-spacing: 0.05em;
 }
 
-.error-message {
-    color: var(--text-muted);
-    font-size: 1.1rem;
-    margin-bottom: 2.5rem;
-    line-height: 1.6;
+.error-narrative {
+    font-size: 1.25rem;
+    line-height: 1.8;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 3rem;
 }
 
-.home-btn {
-    background-color: var(--secondary);
-    color: white;
+.action-row {
+    display: flex;
+    justify-content: center;
+}
+
+.btn-premium.fill {
+    background: #d4af37;
+    color: #000;
+    padding: 16px 40px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    font-weight: 700;
+    letter-spacing: 0.05em;
     border: none;
-    padding: 1rem 2.5rem;
-    border-radius: var(--radius-pill);
-    font-size: 1.1rem;
-    font-weight: 600;
     cursor: pointer;
-    transition: var(--transition);
-    box-shadow: 0 4px 15px rgba(43, 45, 66, 0.2);
+    transition: all 0.3s var(--ease-premium);
 }
 
-.home-btn:hover {
-    background-color: var(--primary);
-    transform: translateY(-3px);
-    box-shadow: 0 8px 25px rgba(188, 71, 73, 0.3);
+.btn-premium.fill:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(212, 175, 55, 0.3);
+}
+
+.ambient-background {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+}
+
+.glow-circle {
+    position: absolute;
+    width: 600px;
+    height: 600px;
+    border-radius: 50%;
+    filter: blur(150px);
+    opacity: 0.1;
+}
+
+.glow-circle.top {
+    top: -300px;
+    right: -100px;
+    background: #d4af37;
+}
+
+.glow-circle.bottom {
+    bottom: -300px;
+    left: -100px;
+    background: #151518;
+}
+
+@media (max-width: 600px) {
+    .error-code {
+        font-size: 4rem;
+    }
+
+    .error-title {
+        font-size: 1.8rem;
+    }
+
+    .error-narrative {
+        font-size: 1.1rem;
+    }
 }

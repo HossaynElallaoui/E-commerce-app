@@ -1,6 +1,6 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-import { AuthProvider } from './context/AuthContext'
-import { LanguageProvider } from './context/LanguageContext'
+import { useState, useEffect } from 'react'
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom'
+import { AnimatePresence } from 'framer-motion'
 import Navbar from './components/Navbar'
 import ProductList from './components/ProductList'
 import Cart from './components/Cart'
@@ -10,52 +10,65 @@ import Register from './components/Register'
 import AdminDashboard from './components/AdminDashboard'
 import ProtectedRoute from './components/ProtectedRoute'
 import OrderDetails from './components/OrderDetails'
+import OrderSuccess from './components/OrderSuccess'
 import NotFound from './components/NotFound'
 import About from './components/About'
 import Contact from './components/Contact'
+import ThreeBackground from './components/ThreeBackground'
 import './App.css'
 
-function App() {
+function AnimatedRoutes() {
+  const location = useLocation();
+
   return (
-    <LanguageProvider>
-      <AuthProvider>
-        <Router>
-          <div className="App">
-            <Navbar />
-            <main className="main-content">
-              <Routes>
-                <Route path="/" element={<ProductList />} />
-                <Route path="/about" element={<About />} />
-                <Route path="/contact" element={<Contact />} />
-                <Route path="/cart" element={<Cart />} />
-                <Route path="/checkout" element={<Checkout />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
-                <Route
-                  path="/admin"
-                  element={
-                    <ProtectedRoute requireAdmin={true}>
-                      <AdminDashboard />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/orders/:id"
-                  element={
-                    <ProtectedRoute requireAdmin={true}>
-                      <OrderDetails />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </main>
-          </div>
-        </Router>
-      </AuthProvider>
-    </LanguageProvider>
+    <AnimatePresence mode="wait">
+      <Routes location={location} key={location.pathname}>
+        <Route path="/" element={<ProductList />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/cart" element={<Cart />} />
+        <Route path="/checkout" element={<Checkout />} />
+        <Route path="/order-success" element={<OrderSuccess />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute requireAdmin={true}>
+              <AdminDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/orders/:id"
+          element={
+            <ProtectedRoute requireAdmin={true}>
+              <OrderDetails />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </AnimatePresence>
+  );
+}
+
+function App() {
+  useEffect(() => {
+    console.log("App mounted successfully!");
+  }, []);
+
+  return (
+    <Router>
+      <div className="App">
+        <ThreeBackground />
+        <Navbar />
+        <main className="main-content">
+          <AnimatedRoutes />
+        </main>
+      </div>
+    </Router>
   )
 }
 
 export default App
-
